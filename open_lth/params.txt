@@ -1,0 +1,124 @@
+usage: 
+==================================================================================
+OpenLTH: A Framework for Research on Lottery Tickets and Beyond
+----------------------------------------------------------------------------------
+open_lth.py train [...] => Train a model.
+==================================================================================
+
+positional arguments:
+  subcommand
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --platform PLATFORM   The platform on which to run the job.
+  --display_output_location
+                        Display the output location for this job.
+
+Platform Hyperparameters:
+  Hyperparameters that control the plaform on which the job is run.
+
+  --num_workers NUM_WORKERS
+                        (optional: int) The number of worker threads to use
+                        for data loading.
+
+High-Level Arguments:
+  Arguments that determine how the job is run and where it is stored.
+
+  --replicate REPLICATE
+                        (default: 1) The index of this particular replicate.
+                        Use a different replicate number to run another copy
+                        of the same experiment.
+  --default_hparams DEFAULT_HPARAMS
+                        (optional: str) Populate all arguments with the
+                        default hyperparameters for this model.
+  --quiet               (optional) Suppress output logging about the training
+                        status.
+  --evaluate_only_at_end
+                        (optional) Run the test set only before and after
+                        training. Otherwise, will run every epoch.
+
+Dataset Hyperparameters:
+  Hyperparameters that select the dataset, data augmentation, and other data
+  transformations.
+
+  --dataset_name DATASET_NAME
+                        (default: cifar10) The name of the dataset. Examples:
+                        mnist, cifar10
+  --batch_size BATCH_SIZE
+                        (default: 128) The size of the mini-batches on which
+                        to train. Example: 64
+  --do_not_augment      (optional) If True, data augmentation is disabled. It
+                        is enabled by default.
+  --transformation_seed TRANSFORMATION_SEED
+                        (optional: int) The random seed that controls dataset
+                        transformations like random labels, subsampling, and
+                        unsupervised labels.
+  --subsample_fraction SUBSAMPLE_FRACTION
+                        (optional: float) Subsample the training set,
+                        retaining the specified fraction: float in (0, 1]
+  --random_labels_fraction RANDOM_LABELS_FRACTION
+                        (optional: float) Apply random labels to a fraction of
+                        the training set: float in (0, 1]
+  --unsupervised_labels UNSUPERVISED_LABELS
+                        (optional: str) Replace the standard labels with
+                        alternative, unsupervised labels. Example: rotation
+  --blur_factor BLUR_FACTOR
+                        (optional: int) Blur the training set by downsampling
+                        and then upsampling by this multiple.
+
+Model Hyperparameters:
+  Hyperparameters that select the model, initialization, and weight
+  freezing.
+
+  --model_name MODEL_NAME
+                        (default: cifar_resnet_20) The name of the model.
+                        Examples: mnist_lenet, cifar_resnet_20, cifar_vgg_16
+  --model_init MODEL_INIT
+                        (default: kaiming_normal) The model initializer.
+                        Examples: kaiming_normal, kaiming_uniform, binary,
+                        orthogonal
+  --batchnorm_init BATCHNORM_INIT
+                        (default: uniform) The batchnorm initializer.
+                        Examples: uniform, fixed
+  --batchnorm_frozen    (optional) If True, all batch normalization parameters
+                        are frozen at initialization.
+  --output_frozen       (optional) If True, all outputt layer parameters are
+                        frozen at initialization.
+  --others_frozen       (optional) If true, all other (non-output, non-
+                        batchnorm) parameters are frozen at initialization.
+  --others_frozen_exceptions OTHERS_FROZEN_EXCEPTIONS
+                        (optional: str) A comma-separated list of any tensors
+                        that should not be frozen.
+
+Training Hyperparameters:
+  Hyperparameters that determine how the model is trained.
+
+  --optimizer_name OPTIMIZER_NAME
+                        (default: sgd) The opimizer with which to train the
+                        network. Examples: sgd, adam
+  --lr LR               (default: 0.1) The learning rate
+  --training_steps TRAINING_STEPS
+                        (default: 160ep) The number of steps to train as
+                        epochs ('160ep') or iterations ('50000it').
+  --data_order_seed DATA_ORDER_SEED
+                        (optional: int) The random seed for the data order. If
+                        not set, the data order is random and unrepeatable.
+  --momentum MOMENTUM   (default: 0.9) The momentum to use with the SGD
+                        optimizer.
+  --nesterov_momentum NESTEROV_MOMENTUM
+                        (optional: float)
+  --milestone_steps MILESTONE_STEPS
+                        (default: 80ep,120ep) Steps when the learning rate
+                        drops by a factor of gamma. Written as comma-separated
+                        steps (80ep,160ep,240ep) where steps are epochs
+                        ('160ep') or iterations ('50000it').
+  --gamma GAMMA         (default: 0.1) The factor at which to drop the
+                        learning rate at each milestone.
+  --warmup_steps WARMUP_STEPS
+                        (optional: str) Steps of linear lr warmup at the start
+                        of training as epochs ('20ep') or iterations ('800it')
+  --weight_decay WEIGHT_DECAY
+                        (default: 0.0001) The L2 penalty to apply to the
+                        weights.
+  --apex_fp16           (optional) Whether to train the model in float16 using
+                        the NVIDIA Apex library.
