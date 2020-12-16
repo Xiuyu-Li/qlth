@@ -398,7 +398,7 @@ def _init_learner(args):
     start_epoch = 0
     if args.resumed_checkpoint_path:
         model, compression_scheduler, optimizer, start_epoch = apputils.load_checkpoint(
-            model, args.resumed_checkpoint_path, model_device=args.device)
+            model, args.resumed_checkpoint_path, model_device=args.device, lth=args.lth)
     elif args.load_model_path:
         model = apputils.load_lean_checkpoint(model, args.load_model_path, model_device=args.device)
     if args.reset_optimizer:

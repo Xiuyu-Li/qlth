@@ -105,8 +105,8 @@ def get_contents_table(d):
     return tabulate(contents, headers=["Key", "Type", "Value"], tablefmt="psql")
 
 
-def load_checkpoint(model, chkpt_file, optimizer=None,
-                    model_device=None, lean_checkpoint=False, strict=False):
+def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None, 
+                    lean_checkpoint=False, strict=False, lth=False):
     """Load a pytorch training checkpoint.
 
     Args:
@@ -190,6 +190,13 @@ def load_checkpoint(model, chkpt_file, optimizer=None,
     msglogger.info("=> loading checkpoint %s", chkpt_file)
     checkpoint = torch.load(chkpt_file, map_location=lambda storage, loc: storage)
     msglogger.info('=> Checkpoint contents:\n%s\n' % get_contents_table(checkpoint))
+    
+    if lth:
+        checkpoint['arch'] = model.arch
+        checkpoint['optimizer_type'] = torch.optim.SGD
+        checkpoint['state_dict'] = checkpoint.pop('model_state_dict')
+        checkpoint['epoch'] = checkpoint.pop('ep')
+
     if 'extras' in checkpoint:
         msglogger.info("=> Checkpoint['extras'] contents:\n{}\n".format(get_contents_table(checkpoint['extras'])))
 
@@ -230,10 +237,15 @@ def load_checkpoint(model, chkpt_file, optimizer=None,
 
     if normalize_dataparallel_keys:
         checkpoint['state_dict'] = {normalize_module_name(k): v for k, v in checkpoint['state_dict'].items()}
+
+    if lth and not all(k.startswith('module.') for k in checkpoint['state_dict']):
+        checkpoint['state_dict'] = {'module.' + k: v for k, v in checkpoint['state_dict'].items()}
+
     anomalous_keys = model.load_state_dict(checkpoint['state_dict'], strict)
     if anomalous_keys:
         # This is pytorch 1.1+
         missing_keys, unexpected_keys = anomalous_keys
+        # msglogger.info(anomalous_keys)
         if unexpected_keys:
             msglogger.warning("Warning: the loaded checkpoint (%s) contains %d unexpected state keys" %
                               (chkpt_file, len(unexpected_keys)))
