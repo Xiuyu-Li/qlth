@@ -314,6 +314,10 @@ def init_classifier_compression_arg_parser(include_ptq_lapq_args=False):
                         help='physically remove zero-filters and create a smaller model')
     parser.add_argument('--lth', dest='lth', action='store_true', default=False,
                         help='Use lottery ticket hypothesis model archs')
+    parser.add_argument('--pruned', dest='pruned', action='store_true', default=False,
+                        help='Use lottery ticket hypothesis pruned model archs')
+    parser.add_argument('--mask-path', '-mp', dest='mask_path', type=str,
+                        help='Path for the lottery ticket mask')
     distiller.quantization.add_post_train_quant_args(parser, add_lapq_args=include_ptq_lapq_args)
     return parser
 
@@ -383,7 +387,8 @@ def _config_compute_device(args):
 def _init_learner(args):
     # Create the model
     model = create_model(args.pretrained, args.dataset, args.arch,
-                         parallel=not args.load_serialized, device_ids=args.gpus, lth=args.lth)
+                         parallel=not args.load_serialized, device_ids=args.gpus, \
+                         lth=args.lth, pruned=args.pruned, mask_path=args.mask_path)
     compression_scheduler = None
 
     # TODO(barrh): args.deprecated_resume is deprecated since v0.3.1
