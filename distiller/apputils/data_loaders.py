@@ -148,7 +148,7 @@ def cifar10_get_datasets(data_dir, load_train=True, load_test=True):
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
         train_dataset = datasets.CIFAR10(root=data_dir, train=True,
@@ -158,7 +158,7 @@ def cifar10_get_datasets(data_dir, load_train=True, load_test=True):
     if load_test:
         test_transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
         ])
 
         test_dataset = datasets.CIFAR10(root=data_dir, train=False,
