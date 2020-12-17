@@ -105,8 +105,7 @@ def patch_torchvision_mobilenet_v2(model):
 _model_extensions = {}
 
 
-def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, 
-                lth=False, pruned=False, mask_path=None):
+def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, lth=False):
     """Create a pytorch model based on the model architecture and dataset
 
     Args:
@@ -130,7 +129,7 @@ def create_model(pretrained, dataset, arch, parallel=True, device_ids=None,
         if dataset == 'imagenet':
             model, cadene = _create_imagenet_model(arch, pretrained)
         elif dataset == 'cifar10':
-            model = _create_cifar10_model(arch, pretrained, lth, pruned, mask_path)
+            model = _create_cifar10_model(arch, pretrained, lth)
         elif dataset == 'mnist':
             model = _create_mnist_model(arch, pretrained, lth)
     except ValueError:
@@ -204,7 +203,7 @@ def _create_imagenet_model(arch, pretrained):
     return model, cadene
 
 
-def _create_cifar10_model(arch, pretrained, lth, pruned, mask_path):
+def _create_cifar10_model(arch, pretrained, lth):
     if pretrained:
         raise ValueError("Model {} (CIFAR10) does not have a pretrained model".format(arch))
     try:
@@ -214,11 +213,6 @@ def _create_cifar10_model(arch, pretrained, lth, pruned, mask_path):
             sys.path.append('../../open_lth')
             from models import cifar_resnet, initializers
             model = cifar_resnet.Model.get_model_from_name('cifar_resnet_20', initializers.kaiming_normal)
-            if pruned:
-                from pruning.pruned_model import PrunedModel
-                assert(mask_path != None)
-                mask = torch.load(mask_path)
-                model = PrunedModel(model, mask=mask)
     except KeyError:
         raise ValueError("Model {} is not supported for dataset CIFAR10".format(arch))
     return model

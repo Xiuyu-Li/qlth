@@ -106,7 +106,8 @@ def get_contents_table(d):
 
 
 def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None, 
-                    lean_checkpoint=False, strict=False, lth=False):
+                    lean_checkpoint=False, strict=False, lth=False, pruned=False, 
+                    mask_path=None):
     """Load a pytorch training checkpoint.
 
     Args:
@@ -197,6 +198,16 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
         checkpoint['state_dict'] = checkpoint.pop('model_state_dict')
         checkpoint['epoch'] = checkpoint.pop('ep')
 
+        if pruned:
+            assert(mask_path != None)
+            mask = torch.load(mask_path)
+            keys = [k for k in checkpoint['state_dict'].keys()]
+            for k in keys:
+                if k.startswith('model'):
+                    checkpoint['state_dict'][k[6:]] = checkpoint['state_dict'].pop(k)
+                else:
+                    del checkpoint['state_dict'][k]
+
     if 'extras' in checkpoint:
         msglogger.info("=> Checkpoint['extras'] contents:\n{}\n".format(get_contents_table(checkpoint['extras'])))
 
@@ -240,6 +251,8 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
 
     if lth and not all(k.startswith('module.') for k in checkpoint['state_dict']):
         checkpoint['state_dict'] = {'module.' + k: v for k, v in checkpoint['state_dict'].items()}
+        if pruned and k in mask:
+            mask = {'module.' + k: v for k, v in mask.items()}
 
     anomalous_keys = model.load_state_dict(checkpoint['state_dict'], strict)
     if anomalous_keys:
@@ -252,6 +265,11 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
         if missing_keys:
             raise ValueError("The loaded checkpoint (%s) is missing %d state keys" %
                              (chkpt_file, len(missing_keys)))
+
+    if pruned:
+        for name, param in model.named_parameters():
+            if name in mask.keys():
+                param.data *= mask[name]
 
     if model_device is not None:
         model.to(model_device)

@@ -387,8 +387,8 @@ def _config_compute_device(args):
 def _init_learner(args):
     # Create the model
     model = create_model(args.pretrained, args.dataset, args.arch,
-                         parallel=not args.load_serialized, device_ids=args.gpus, \
-                         lth=args.lth, pruned=args.pruned, mask_path=args.mask_path)
+                         parallel=not args.load_serialized, device_ids=args.gpus,
+                         lth=args.lth)
     compression_scheduler = None
 
     # TODO(barrh): args.deprecated_resume is deprecated since v0.3.1
@@ -403,7 +403,8 @@ def _init_learner(args):
     start_epoch = 0
     if args.resumed_checkpoint_path:
         model, compression_scheduler, optimizer, start_epoch = apputils.load_checkpoint(
-            model, args.resumed_checkpoint_path, model_device=args.device, lth=args.lth)
+            model, args.resumed_checkpoint_path, model_device=args.device, lth=args.lth,
+            pruned=args.pruned, mask_path=args.mask_path)
     elif args.load_model_path:
         model = apputils.load_lean_checkpoint(model, args.load_model_path, model_device=args.device)
     if args.reset_optimizer:
