@@ -9,6 +9,9 @@ import os
 def checkpoint(root): return os.path.join(root, 'checkpoint.pth')
 
 
+def best(root): return os.path.join(root, 'model_best.pth')
+
+
 def logger(root): return os.path.join(root, 'logger')
 
 

@@ -11,6 +11,8 @@ from platforms.platform import get_platform
 class MetricLogger:
     def __init__(self):
         self.log = {}
+        self.best_acc = 0
+        self.is_best = False
 
     def add(self, name: str, step: Step, value: float):
         self.log[(name, step.iteration)] = value

@@ -13,13 +13,16 @@ from training.metric_logger import MetricLogger
 
 def save_checkpoint_callback(output_location, step, model, optimizer, logger):
     if get_platform().is_primary_process:
-        get_platform().save_model({
+        ckpt = {
             'ep': step.ep,
             'it': step.it,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
             'logger': str(logger),
-        }, paths.checkpoint(output_location))
+        }
+        get_platform().save_model(ckpt, paths.checkpoint(output_location))
+        if logger.is_best:
+            get_platform().save_model(ckpt, paths.best(output_location))
     get_platform().barrier()
 
 

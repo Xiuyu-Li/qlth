@@ -77,6 +77,11 @@ def create_eval_callback(eval_name: str, loader: DataLoader, verbose=False):
             logger.add('{}_accuracy'.format(eval_name), step, total_correct / example_count)
             logger.add('{}_examples'.format(eval_name), step, example_count)
 
+            logger.is_best = False
+            if total_correct / example_count > logger.best_acc:
+                logger.is_best = True
+                logger.best_acc = total_correct / example_count
+
             if verbose:
                 nonlocal time_of_last_call
                 elapsed = 0 if time_of_last_call is None else time.time() - time_of_last_call
