@@ -212,7 +212,10 @@ def _create_cifar10_model(arch, pretrained, lth):
         else:
             sys.path.append('../../open_lth')
             from models import cifar_resnet, initializers
-            model = cifar_resnet.Model.get_model_from_name('cifar_resnet_20', initializers.kaiming_normal)
+            if arch == 'resnet20_cifar':
+                model = cifar_resnet.Model.get_model_from_name('cifar_resnet_20', initializers.kaiming_normal)
+            elif arch == 'resnet56_cifar':
+                model = cifar_resnet.Model.get_model_from_name('cifar_resnet_56', initializers.kaiming_normal)
     except KeyError:
         raise ValueError("Model {} is not supported for dataset CIFAR10".format(arch))
     return model

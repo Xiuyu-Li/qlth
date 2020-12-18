@@ -78,6 +78,20 @@ def load(save_location: str, save_step: Step, model_hparams: ModelHparams, outpu
     return model
 
 
+def load_best(save_location: str, model_hparams: ModelHparams, outputs=None):
+    checkpoint = get_platform().load_model(paths.best(save_location))
+    keys = [k for k in checkpoint['model_state_dict'].keys()]
+    for k in keys:
+        if k.startswith('model'):
+            checkpoint['model_state_dict'][k[6:]] = checkpoint['model_state_dict'].pop(k)
+        else:
+            del checkpoint['model_state_dict'][k]
+
+    model = get(model_hparams, outputs)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    return model
+
+
 def exists(save_location, save_step):
     return get_platform().exists(paths.model(save_location, save_step))
 

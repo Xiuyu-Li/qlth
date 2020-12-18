@@ -182,6 +182,8 @@ class Model(base.Model):
 
         if model_name == 'cifar_resnet_20':
             layers = [3, 3, 3]
+        elif model_name == 'cifar_resnet_56':
+            layers = [9, 9, 9]
         
         return Model(BasicBlock, layers, initializer)
 
