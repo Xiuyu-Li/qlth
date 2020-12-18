@@ -28,7 +28,7 @@ from numbers import Number
 from tabulate import tabulate
 import torch
 import distiller
-from distiller.utils import normalize_module_name
+from distiller.utils import normalize_module_name, model_sparsity
 msglogger = logging.getLogger()
 
 
@@ -251,8 +251,6 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
 
     if lth and not all(k.startswith('module.') for k in checkpoint['state_dict']):
         checkpoint['state_dict'] = {'module.' + k: v for k, v in checkpoint['state_dict'].items()}
-        if pruned and k in mask:
-            mask = {'module.' + k: v for k, v in mask.items()}
 
     anomalous_keys = model.load_state_dict(checkpoint['state_dict'], strict)
     if anomalous_keys:
@@ -267,9 +265,11 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
                              (chkpt_file, len(missing_keys)))
 
     if pruned:
-        for name, param in model.named_parameters():
-            if name in mask.keys():
-                param.data *= mask[name]
+        for pname, mask in mask.items():
+            if 'module.' + pname in model.state_dict():
+                model.state_dict()['module.' + pname].mul_(mask.cuda())
+
+        msglogger.info(f"The pruned model sparsity is {model_sparsity(model)}")
 
     if model_device is not None:
         model.to(model_device)

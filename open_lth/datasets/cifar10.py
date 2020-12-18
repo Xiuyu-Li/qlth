@@ -53,8 +53,10 @@ class Dataset(base.ImageDataset):
         return Dataset(test_set.data, np.array(test_set.targets))
 
     def __init__(self,  examples, labels, image_transforms=None):
+        CIFAR_MEAN = [0.49139968, 0.48215827, 0.44653124]
+        CIFAR_STD = [0.24703233, 0.24348505, 0.26158768]
         super(Dataset, self).__init__(examples, labels, image_transforms or [],
-                                      [torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+                                      [torchvision.transforms.Normalize(CIFAR_MEAN, CIFAR_STD)])
 
     def example_to_image(self, example):
         return Image.fromarray(example)

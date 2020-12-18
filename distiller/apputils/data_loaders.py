@@ -143,12 +143,14 @@ def cifar10_get_datasets(data_dir, load_train=True, load_test=True):
     arXiv:1409.5185, 2014
     """
     train_dataset = None
+    CIFAR_MEAN = [0.49139968, 0.48215827, 0.44653124]
+    CIFAR_STD = [0.24703233, 0.24348505, 0.26158768]
     if load_train:
         train_transform = transforms.Compose([
             transforms.RandomCrop(32, padding=4),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            transforms.Normalize(CIFAR_MEAN, CIFAR_STD)
         ])
 
         train_dataset = datasets.CIFAR10(root=data_dir, train=True,
@@ -158,7 +160,7 @@ def cifar10_get_datasets(data_dir, load_train=True, load_test=True):
     if load_test:
         test_transform = transforms.Compose([
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            transforms.Normalize(CIFAR_MEAN, CIFAR_STD)
         ])
 
         test_dataset = datasets.CIFAR10(root=data_dir, train=False,
