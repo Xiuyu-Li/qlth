@@ -249,7 +249,7 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
     if normalize_dataparallel_keys:
         checkpoint['state_dict'] = {normalize_module_name(k): v for k, v in checkpoint['state_dict'].items()}
 
-    if lth and not all(k.startswith('module.') for k in checkpoint['state_dict']):
+    if model.is_parallel and not all(k.startswith('module.') for k in checkpoint['state_dict']):
         checkpoint['state_dict'] = {'module.' + k: v for k, v in checkpoint['state_dict'].items()}
 
     anomalous_keys = model.load_state_dict(checkpoint['state_dict'], strict)
@@ -270,6 +270,11 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
                 model.state_dict()['module.' + pname].mul_(mask.cuda())
 
         msglogger.info(f"The pruned model sparsity is {model_sparsity(model)}")
+        acc = checkpoint['logger'].split('\n')[-2].split(',')[-1]
+        
+        with open(f"../../scores/{checkpoint['arch']}.txt", "a+") as write_obj:
+            write_obj.write(f"{acc}," +
+                            f"{model_sparsity(model)}\n")
 
     if model_device is not None:
         model.to(model_device)
