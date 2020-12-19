@@ -26,7 +26,6 @@ class Model(base.Model):
 
         self.fc_layers = nn.ModuleList(layers)
         self.fc = nn.Linear(current_size, outputs)
-        self.criterion = nn.CrossEntropyLoss()
 
         self.apply(initializer)
 
@@ -66,7 +65,7 @@ class Model(base.Model):
 
     @property
     def loss_criterion(self):
-        return self.criterion
+        return nn.CrossEntropyLoss()
 
     @staticmethod
     def default_hparams():

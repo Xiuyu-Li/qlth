@@ -230,7 +230,8 @@ def _create_mnist_model(arch, pretrained, lth):
         else:
             sys.path.append('../../open_lth')
             from models import mnist_lenet, initializers
-            model = mnist_lenet.Model.get_model_from_name('mnist_lenet_300_100', initializers.kaiming_normal)
+            if arch == 'simplenet_mnist':
+                model = mnist_lenet.Model.get_model_from_name('mnist_lenet_300_100', initializers.kaiming_normal)
     except KeyError:
         raise ValueError("Model {} is not supported for dataset MNIST".format(arch))
     return model
