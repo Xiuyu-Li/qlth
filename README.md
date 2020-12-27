@@ -1,9 +1,9 @@
 # Quantizing Lottery Tickets
-The code for QLTH, a 2-step model compression scheme that applies Post-Training Quantization on the subnetworks derived by iterative magnitude prunning used in finding ”winning tickets” or ”matching”.
+This is the code for QLTH, a 2-step model compression scheme that applies Post-Training Quantization on the subnetworks derived by iterative magnitude prunning used in finding ”winning tickets” or ”matching”.
 
 ## LTH Experiments
 
-All LTH experiments are conducted using [OpenLTH](https://github.com/facebookresearch/open_lth) framework, which is located in the folder `open_lth`.
+All LTH experiments are conducted using the [OpenLTH](https://github.com/facebookresearch/open_lth) framework, which is located in the folder `open_lth`.
 
 First do `cd open_lth`, then:
 
@@ -44,12 +44,10 @@ This section includes parts of the results provided in the report.
 **LeNet 300-100 on MNIST dataset using our IMP-quantization pipeline**
 
 <img src="imgs/mnist.png" width = "600" height = "400">
-<br></br>
 
 **ResNet 20 on CIFAR10 dataset using our IMP-quantization pipeline (with rewinding in IMP)**
 
 <img src="imgs/resnet20_rewind.png" width = "600" height = "400">
-<br></br>
 
 **ResNet 56 on CIFAR10 dataset using our IMP-quantization pipeline (with rewinding in IMP)**
 
