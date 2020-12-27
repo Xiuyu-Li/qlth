@@ -4,3 +4,4 @@ __pycache__
 *.pth
 *.pth.tar
 *.egg-info
+*.txt
