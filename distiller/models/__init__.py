@@ -105,7 +105,7 @@ def patch_torchvision_mobilenet_v2(model):
 _model_extensions = {}
 
 
-def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, lth=False):
+def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, lth=False, pruned=False, mask_path=False):
     """Create a pytorch model based on the model architecture and dataset
 
     Args:
@@ -122,6 +122,8 @@ def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, lth=
     dataset = dataset.lower()
     if dataset not in SUPPORTED_DATASETS:
         raise ValueError('Dataset {} is not supported'.format(dataset))
+    if lth:
+        sys.path.append('../../open_lth')
 
     model = None
     cadene = False
@@ -140,6 +142,14 @@ def create_model(pretrained, dataset, arch, parallel=True, device_ids=None, lth=
 
     msglogger.info("=> created a %s%s model with the %s dataset" % ('pretrained ' if pretrained else '',
                                                                      arch, dataset))
+
+    if lth and pruned:
+        assert(mask_path != None)
+        mask = torch.load(mask_path)
+        for pname, mask in mask.items():
+            if pname in model.state_dict():
+                model.state_dict()[pname].mul_(mask)
+
     if torch.cuda.is_available() and device_ids != -1:
         device = 'cuda'
         if parallel:
@@ -210,7 +220,6 @@ def _create_cifar10_model(arch, pretrained, lth):
         if not lth:
             model = cifar10_models.__dict__[arch]()
         else:
-            sys.path.append('../../open_lth')
             from models import cifar_resnet, initializers
             if arch == 'resnet20_cifar':
                 model = cifar_resnet.Model.get_model_from_name('cifar_resnet_20', initializers.kaiming_normal)
@@ -228,7 +237,6 @@ def _create_mnist_model(arch, pretrained, lth):
         if not lth:
             model = mnist_models.__dict__[arch]()
         else:
-            sys.path.append('../../open_lth')
             from models import mnist_lenet, initializers
             if arch == 'simplenet_mnist':
                 model = mnist_lenet.Model.get_model_from_name('mnist_lenet_300_100', initializers.kaiming_normal)

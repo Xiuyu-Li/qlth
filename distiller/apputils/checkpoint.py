@@ -270,11 +270,11 @@ def load_checkpoint(model, chkpt_file, optimizer=None, model_device=None,
                 model.state_dict()['module.' + pname].mul_(mask.cuda())
 
         msglogger.info(f"The pruned model sparsity is {model_sparsity(model)}")
-        acc = checkpoint['logger'].split('\n')[-2].split(',')[-1]
+        acc = float(checkpoint['logger'].split('\n')[-2].split(',')[-1]) * 100
         
-        with open(f"../../scores/{checkpoint['arch']}.txt", "a+") as write_obj:
-            write_obj.write(f"{acc}," +
-                            f"{model_sparsity(model)}\n")
+        # with open(f"../../scores/{checkpoint['arch']}.txt", "a+") as write_obj:
+        #     write_obj.write(f"{acc:.2f}," +
+        #                     f"{model_sparsity(model):.2f}\n")
 
     if model_device is not None:
         model.to(model_device)

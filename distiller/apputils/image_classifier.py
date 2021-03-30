@@ -388,7 +388,9 @@ def _init_learner(args):
     # Create the model
     model = create_model(args.pretrained, args.dataset, args.arch,
                          parallel=not args.load_serialized, device_ids=args.gpus,
-                         lth=args.lth)
+                         lth=args.lth, pruned=args.pruned, mask_path=args.mask_path)
+    masks_dict = {pname: (torch.ne(param, 0)).type(param.type())
+                        for pname, param in model.named_parameters()}
     compression_scheduler = None
 
     # TODO(barrh): args.deprecated_resume is deprecated since v0.3.1
@@ -424,6 +426,7 @@ def _init_learner(args):
         # requires a compression schedule configuration file in YAML.
         compression_scheduler = distiller.file_config(model, optimizer, args.compress, compression_scheduler,
             (start_epoch-1) if args.resumed_checkpoint_path else None)
+
         # Model is re-transferred to GPU in case parameters were added (e.g. PACTQuantizer)
         model.to(args.device)
     elif compression_scheduler is None:
@@ -951,8 +954,8 @@ def quantize_and_test_model(test_loader, model, criterion, args, loggers=None, s
         apputils.save_checkpoint(0, args_qe.arch, qe_model, scheduler=scheduler,
             name='_'.join([args_qe.name, checkpoint_name]) if args_qe.name else checkpoint_name,
             dir=msglogger.logdir, extras={'quantized_top1': test_res[0]})
-    with open(f"../../scores/{args_qe.arch}_quantized.txt", "a+") as write_obj:
-        write_obj.write(f"{test_res[0]}," +
+    with open(f"../../scores/{args_qe.arch}_rewind_quantized.txt", "a+") as write_obj:
+        write_obj.write(f"{test_res[0]:.2f}," +
                         f"{args.qe_bits_acts}," +
                         f"{args.qe_bits_wts}\n")
 
